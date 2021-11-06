@@ -9,35 +9,17 @@ const { stdin, stdout } = require("process");
 const logger = fs.createWriteStream(file);
 const rl = readline.createInterface({ input: stdin, output: stdout });
 
-// fs.open(file, "w", (err, data) => {
-//   if (err) throw err;
-//   console.log("File created", data);
-// });
-
 rl.question("Write something:\n ", (answer) => {
-  logger.write(`${answer}\n`);
   rl.on("line", (input) => {
     if (input.includes("exit")) {
-      console.log("GoodBye!");
+      // console.log("Goodbye!");
       rl.close();
     } else {
+      // console.log("input", input);
+      logger.write(`${answer}\n`);
       logger.write(`${input}\n`);
     }
   }).on("close", () => {
-    stdout.write("Bye!");
+    stdout.write("Goodbye!");
   });
 });
-
-// rl.question("Write something:\n ", (answer) => {
-//   logger.write(`${answer}\n`);
-//   rl.on("line", (input) => {
-//     if (input === "exit") {
-//       rl.close();
-//     } else {
-//       logger.write(`${input}\n`);
-//     }
-//   });
-//   rl.on("close", () => {
-//     stdout.write("Bye!");
-//   });
-// });
