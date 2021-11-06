@@ -23,9 +23,8 @@ rl.question("Write something:\n ", (answer) => {
     } else {
       logger.write(`${input}\n`);
     }
-  });
-  rl.on("close", () => {
-    console.log("GoodBye!");
+  }).on("close", () => {
+    stdout.write("Bye!");
   });
 });
 

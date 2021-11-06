@@ -2,7 +2,7 @@ const fs = require("fs");
 const readline = require("readline");
 const process = require("process");
 const path = require("path");
-const projectFolder = path.join(__dirname, "project-dist");
+const projectFolder = path.join(__dirname, "project-dist", "assets");
 const projectStyles = path.join(__dirname, "project-dist", "style.css");
 const projectIndex = path.join(__dirname, "project-dist", "index.html");
 const currentAssets = path.join(__dirname, "assets");
@@ -75,9 +75,7 @@ function getCurrentStyles() {
 
 function getCurrentIndex() {
   fs.readdir(currentComponents, (err, files) => {
-    let header;
-    let articles;
-    let footer;
+    let arrComponents = {};
     if (err) throw err;
     files.forEach((file) => {
       fs.readFile(
@@ -86,52 +84,25 @@ function getCurrentIndex() {
         (err, content) => {
           if (err) throw err;
           let fileName = path.parse(file).name;
-          //   console.log(path.parse(file).name);
-          if (fileName === "header") {
-            header = content;
-          }
-          if (fileName === "articles") {
-            articles = content;
-          }
-          if (fileName === "footer") {
-            footer = content;
-          }
+          arrComponents[`${fileName}`] = content;
         }
       );
     });
     fs.readFile(currentTemplate, "utf-8", (err, data) => {
       if (err) throw err;
-
-      if (data.includes("{{header}}")) {
-        data = data.replace(/{{header}}/g, header);
+      for (let key in arrComponents) {
+        // console.log("wwwww", key);
+        if (arrComponents.hasOwnProperty(key)) {
+          if (data.includes(`{{${key}}}`)) {
+            data = data.replace(`{{${key}}}`, arrComponents[key]);
+            // console.log("aaaa", arrComponents[key]);
+          }
+        }
       }
-      if (data.includes("{{articles}}")) {
-        data = data.replace(/{{articles}}/g, articles);
-      }
-      if (data.includes("{{footer}}")) {
-        data = data.replace(/{{footer}}/g, footer);
-      }
-
       fs.appendFile(projectIndex, data, (err) => {
         if (err) throw err;
+        // console.log("arrComponents", arrComponents);
       });
     });
-
-    // if (data.includes("{{header}}") && fileName.includes("header")) {
-    //   console.log(
-    //     data.includes("{{header}}"),
-    //     fileName.includes("header")
-    //   );
-    //   data.replace("{{header}}", content);
-    // }
-    // if (
-    //   data.includes("{{articles}}") &&
-    //   fileName.includes("articles")
-    // ) {
-    //   data.replace("{{articles}}", content);
-    // }
-    // if (data.includes("{{footer}}") && fileName.includes("footer")) {
-    //   data.replace("{{footer}}", content);
-    // }
   });
 }
