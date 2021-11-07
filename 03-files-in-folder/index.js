@@ -18,7 +18,7 @@ fs.readdir(link, { withFileTypes: true }, (err, files) => {
             console.log(
               `${path.parse(file.name).name} - ${path
                 .parse(file.name)
-                .ext.replace(".", "")} - ${states.size}`
+                .ext.replace(".", "")} - ${states.size / 1000}kb`
             );
           }
         });
