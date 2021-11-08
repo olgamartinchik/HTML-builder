@@ -1,6 +1,4 @@
 const fs = require("fs");
-const readline = require("readline");
-const process = require("process");
 const path = require("path");
 const projectFolder = path.join(__dirname, "project-dist", "assets");
 const projectStyles = path.join(__dirname, "project-dist", "style.css");
@@ -12,13 +10,10 @@ const currentTemplate = path.join(__dirname, "template.html");
 
 fs.mkdir(projectFolder, { recursive: true }, (err) => {
   if (err) throw err;
-  //   console.log("projectFile", projectFolder);
-  if (projectIndex !== undefined) {
-    fs.truncate(projectIndex, 0, function () {});
-  }
+
+  getCurrentIndex();
   getCurrentAssets();
   getCurrentStyles();
-  getCurrentIndex();
 });
 function getCurrentAssets() {
   fs.readdir(currentAssets, (err, folders) => {
@@ -74,35 +69,37 @@ function getCurrentStyles() {
 }
 
 function getCurrentIndex() {
-  fs.readdir(currentComponents, (err, files) => {
-    let arrComponents = {};
+  if (projectIndex !== undefined) {
+    fs.truncate(projectIndex, 0, function () {});
+  }
+  fs.readFile(currentTemplate, "utf-8", (err, data) => {
     if (err) throw err;
-    files.forEach((file) => {
-      fs.readFile(
-        path.join(__dirname, "components", file),
-        "utf-8",
-        (err, content) => {
-          if (err) throw err;
-          let fileName = path.parse(file).name;
-          arrComponents[`${fileName}`] = content;
-        }
-      );
-    });
-    fs.readFile(currentTemplate, "utf-8", (err, data) => {
+    fs.readdir(currentComponents, (err, files) => {
       if (err) throw err;
-      for (let key in arrComponents) {
-        // console.log("wwwww", key);
-        if (arrComponents.hasOwnProperty(key)) {
-          if (data.includes(`{{${key}}}`)) {
-            data = data.replace(`{{${key}}}`, arrComponents[key]);
-            // console.log("aaaa", arrComponents[key]);
+      const getDataComponents = (fileIdx) => {
+        if (fileIdx >= files.length) return;
+        const file = files[fileIdx];
+        // console.log(fileIdx);
+
+        fs.readFile(
+          path.join(__dirname, "components", file),
+          "utf-8",
+          (err, content) => {
+            if (err) throw err;
+            let fileName = path.parse(file).name;
+            // console.log("fileName", fileName);
+            if (data.includes(`{{${fileName}}}`)) {
+              let reg = new RegExp(`{{${fileName}}}`);
+              data = data.replace(reg, `${content}`);
+            }
+            fs.writeFile(projectIndex, data, (err) => {
+              getDataComponents(fileIdx + 1);
+              if (err) throw err;
+            });
           }
-        }
-      }
-      fs.appendFile(projectIndex, data, (err) => {
-        if (err) throw err;
-        // console.log("arrComponents", arrComponents);
-      });
+        );
+      };
+      getDataComponents(0);
     });
   });
 }

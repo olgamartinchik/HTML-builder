@@ -10,7 +10,6 @@ fs.readdir(currentFolder, (err, files) => {
 
   files.forEach((file) => {
     if (path.extname(file) === ".css") {
-      //   console.log(file);
       if (projectFile !== undefined) {
         fs.truncate(projectFile, 0, function () {});
       }
