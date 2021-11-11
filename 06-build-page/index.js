@@ -10,7 +10,6 @@ const currentTemplate = path.join(__dirname, "template.html");
 
 fs.mkdir(projectFolder, { recursive: true }, (err) => {
   if (err) throw err;
-
   getCurrentIndex();
   getCurrentAssets();
   getCurrentStyles();
@@ -18,8 +17,14 @@ fs.mkdir(projectFolder, { recursive: true }, (err) => {
 function getCurrentAssets() {
   fs.readdir(currentAssets, (err, folders) => {
     if (err) throw err;
+
     folders.forEach((folder) => {
-      //add folder assets
+      // if (folder !== undefined) {
+      //   fs.rmdir(folder, (err) => {
+      //     if (err) throw err;
+      //   });
+      // }
+      // add folder assets
       fs.mkdir(
         path.join(__dirname, "project-dist", "assets", folder),
         { recursive: true },
@@ -27,9 +32,11 @@ function getCurrentAssets() {
           if (err) throw err;
         }
       );
+
       //read subfolders
       fs.readdir(path.join(__dirname, "assets", folder), (err, files) => {
         if (err) throw err;
+
         files.forEach((file) => {
           fs.copyFile(
             path.join(__dirname, "assets", folder, file),

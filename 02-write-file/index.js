@@ -10,12 +10,14 @@ const logger = fs.createWriteStream(file);
 const rl = readline.createInterface({ input: stdin, output: stdout });
 
 rl.question("Write something:\n ", (answer) => {
+  logger.write(`${answer}\n`);
   rl.on("line", (input) => {
     if (input.includes("exit")) {
       // console.log("Goodbye!");
       rl.close();
     } else {
       // console.log("input", input);
+
       logger.write(`${answer}\n`);
       logger.write(`${input}\n`);
     }
