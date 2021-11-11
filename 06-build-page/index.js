@@ -10,20 +10,43 @@ const currentTemplate = path.join(__dirname, "template.html");
 
 fs.mkdir(projectFolder, { recursive: true }, (err) => {
   if (err) throw err;
+
   getCurrentIndex();
   getCurrentAssets();
   getCurrentStyles();
 });
 function getCurrentAssets() {
+  fs.readdir(projectFolder, (err, folders) => {
+    if (err) throw err;
+    if (folders !== undefined) {
+      folders.forEach((folder) => {
+        fs.readdir(
+          path.join(__dirname, "project-dist", "assets", folder),
+          (err, files) => {
+            if (err) throw err;
+
+            files.forEach((file) => {
+              if (
+                path.join(__dirname, "project-dist", "assets", folder, file) !==
+                undefined
+              ) {
+                fs.unlink(
+                  path.join(__dirname, "project-dist", "assets", folder, file),
+                  (err) => {
+                    if (err) throw err;
+                  }
+                );
+              }
+            });
+          }
+        );
+      });
+    }
+  });
   fs.readdir(currentAssets, (err, folders) => {
     if (err) throw err;
 
     folders.forEach((folder) => {
-      // if (folder !== undefined) {
-      //   fs.rmdir(folder, (err) => {
-      //     if (err) throw err;
-      //   });
-      // }
       // add folder assets
       fs.mkdir(
         path.join(__dirname, "project-dist", "assets", folder),
